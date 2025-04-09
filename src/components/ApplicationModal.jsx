@@ -41,7 +41,7 @@ function ApplicationModal({ application, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    updateApplication(application.id, formData)
+    updateApplication(application._id, formData)
     onClose()
   }
 

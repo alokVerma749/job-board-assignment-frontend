@@ -51,6 +51,7 @@ export function ApplicationProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(applicationData),
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -76,6 +77,7 @@ export function ApplicationProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(applicationData),
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -102,6 +104,7 @@ export function ApplicationProvider({ children }) {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       });
 
       if (!response.ok) {
