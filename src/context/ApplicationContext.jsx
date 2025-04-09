@@ -1,100 +1,121 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect } from "react"
-import { mockApplications } from "../data/mockData"
+import { createContext, useContext, useState, useEffect } from "react";
 
-const ApplicationContext = createContext()
+const ApplicationContext = createContext();
 
 export function useApplications() {
-  return useContext(ApplicationContext)
+  return useContext(ApplicationContext);
 }
 
 export function ApplicationProvider({ children }) {
-  const [applications, setApplications] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call to fetch applications
-    fetchApplications()
-  }, [])
+    fetchApplications();
+  }, []);
 
+  // Fetch all applications from the backend
   const fetchApplications = async () => {
+    setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      const response = await fetch("http://localhost:8000/api/applications/get-all-applications", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include'
+      });
 
-      // Get applications from localStorage or use mock data
-      const storedApplications = localStorage.getItem("applications")
-      if (storedApplications) {
-        setApplications(JSON.parse(storedApplications))
-      } else {
-        setApplications(mockApplications)
-        localStorage.setItem("applications", JSON.stringify(mockApplications))
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to fetch applications");
       }
 
-      setLoading(false)
+      const data = await response.json();
+      setApplications(data.data || []);
     } catch (error) {
-      console.error("Error fetching applications:", error)
-      setLoading(false)
+      console.error("Error fetching applications:", error);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
+  // Add a new application
   const addApplication = async (applicationData) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300))
+      const response = await fetch("http://localhost:8000/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(applicationData),
+      });
 
-      const newApplication = {
-        id: Date.now().toString(),
-        ...applicationData,
-        createdAt: new Date().toISOString(),
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to add application");
       }
 
-      const updatedApplications = [...applications, newApplication]
-      setApplications(updatedApplications)
-      localStorage.setItem("applications", JSON.stringify(updatedApplications))
-
-      return newApplication
+      const newApplication = await response.json();
+      setApplications((prev) => [...prev, newApplication.data]);
+      return newApplication.data;
     } catch (error) {
-      console.error("Error adding application:", error)
-      throw error
+      console.error("Error adding application:", error);
+      throw error;
     }
-  }
+  };
 
+  // Update an existing application
   const updateApplication = async (id, applicationData) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300))
+      const response = await fetch(`http://localhost:8000/api/applications/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(applicationData),
+      });
 
-      const updatedApplications = applications.map((app) =>
-        app.id === id ? { ...app, ...applicationData, updatedAt: new Date().toISOString() } : app,
-      )
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to update application");
+      }
 
-      setApplications(updatedApplications)
-      localStorage.setItem("applications", JSON.stringify(updatedApplications))
-
-      return updatedApplications.find((app) => app.id === id)
+      const updatedApplication = await response.json();
+      setApplications((prev) =>
+        prev.map((app) => (app._id === id ? updatedApplication.data : app))
+      );
+      return updatedApplication.data;
     } catch (error) {
-      console.error("Error updating application:", error)
-      throw error
+      console.error("Error updating application:", error);
+      throw error;
     }
-  }
+  };
 
+  // Delete an application
   const deleteApplication = async (id) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300))
+      const response = await fetch(`http://localhost:8000/api/applications/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      const updatedApplications = applications.filter((app) => app.id !== id)
-      setApplications(updatedApplications)
-      localStorage.setItem("applications", JSON.stringify(updatedApplications))
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to delete application");
+      }
 
-      return true
+      setApplications((prev) => prev.filter((app) => app._id !== id));
+      return true;
     } catch (error) {
-      console.error("Error deleting application:", error)
-      throw error
+      console.error("Error deleting application:", error);
+      throw error;
     }
-  }
+  };
 
   const value = {
     applications,
@@ -103,7 +124,7 @@ export function ApplicationProvider({ children }) {
     updateApplication,
     deleteApplication,
     fetchApplications,
-  }
+  };
 
-  return <ApplicationContext.Provider value={value}>{children}</ApplicationContext.Provider>
+  return <ApplicationContext.Provider value={value}>{children}</ApplicationContext.Provider>;
 }
