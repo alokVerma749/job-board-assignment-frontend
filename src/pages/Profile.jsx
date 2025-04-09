@@ -1,18 +1,58 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "../context/AuthContext"
 
 function Profile() {
   const { user } = useAuth()
+  const [userData, setUserData] = useState(null)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
+
   const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Smith",
+    firstname: "",
+    lastname: "",
     email: user ? user.email : "",
-    phone: "(555) 123-4567",
-    location: "New York, NY",
-    bio: "Computer Science student at NYU, graduating in 2023. Passionate about web development and machine learning.",
+    phone: "",
+    location: "",
+    bio: "",
   })
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/auth/user/${user?.email}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (!response.ok) {
+          const data = await response.json()
+          console.log(data, '###')
+          throw new Error(data.message || "Failed to fetch user data")
+        }
+
+        const data = await response.json()
+        setUserData(data.data)
+        console.log(userData, '###')
+        // Update formData with the fetched user data
+        setFormData((prev) => ({
+          ...prev,
+          ...data.data,
+        }))
+      } catch (error) {
+        setError(error.message || "Failed to fetch user data")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (user?.email) {
+      fetchUserData()
+    }
+  }, [user])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -22,11 +62,30 @@ function Profile() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Save profile data (would connect to API in a real app)
-    alert("Profile updated successfully!")
+    try {
+      const response = await fetch(`http://localhost:8000/api/auth/user/${user?.email}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message || "Failed to update profile")
+      }
+
+      alert("Profile updated successfully!")
+    } catch (err) {
+      alert(err.message)
+    }
   }
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div className="text-red-500">{error}</div>
 
   return (
     <div className="page-container">
@@ -37,11 +96,10 @@ function Profile() {
           <div className="md:w-1/3">
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 rounded-full bg-blue-500 flex items-center justify-center text-white text-4xl font-bold mb-4">
-                {formData.firstName.charAt(0)}
-                {formData.lastName.charAt(0)}
+                {formData.firstname?.charAt(0) || ""}{formData.lastname?.charAt(0) || ""}
               </div>
               <h2 className="text-xl font-semibold">
-                {formData.firstName} {formData.lastName}
+                {formData.firstname} {formData.lastname}
               </h2>
               <p className="text-gray-600">{formData.email}</p>
             </div>
@@ -54,8 +112,8 @@ function Profile() {
                   <label className="block text-gray-700 text-sm font-bold mb-2">First Name</label>
                   <input
                     type="text"
-                    name="firstName"
-                    value={formData.firstName}
+                    name="firstname"
+                    value={formData.firstname}
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
                   />
@@ -65,8 +123,8 @@ function Profile() {
                   <label className="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
                   <input
                     type="text"
-                    name="lastName"
-                    value={formData.lastName}
+                    name="lastname"
+                    value={formData.lastname}
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
                   />
