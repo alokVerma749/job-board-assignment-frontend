@@ -1,47 +1,56 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useApplications } from "../context/ApplicationContext"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function AddJob() {
-  const navigate = useNavigate()
-  const { addApplication } = useApplications()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     companyName: "",
     jobRole: "",
     location: "",
     status: "",
-    appliedDate: "",
-    jobUrl: "",
+    applicationDate: "",
+    jobPostingURL: "",
     salaryRange: "",
     notes: "",
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      await addApplication(formData)
-      navigate("/applications")
+      const response = await fetch("http://localhost:8000/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add application");
+      }
+
+      navigate("/applications");
     } catch (error) {
-      setError("Failed to add application. Please try again.")
+      setError("Failed to add application. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="page-container">
@@ -109,8 +118,7 @@ function AddJob() {
                     <option value="">Select status</option>
                     <option value="Applied">Applied</option>
                     <option value="Interview">Interview</option>
-                    <option value="Offer">Offer</option>
-                    <option value="Rejected">Rejected</option>
+                    <option value="Offer Rejected">Offer Rejected</option>
                   </select>
                 </div>
 
@@ -118,8 +126,8 @@ function AddJob() {
                   <label className="block text-gray-700 text-sm font-bold mb-2">Application Date *</label>
                   <input
                     type="date"
-                    name="appliedDate"
-                    value={formData.appliedDate}
+                    name="applicationDate"
+                    value={formData.applicationDate}
                     onChange={handleChange}
                     className="w-full p-3 border rounded-md"
                     required
@@ -143,8 +151,8 @@ function AddJob() {
                 <label className="block text-gray-700 text-sm font-bold mb-2">Job Posting URL</label>
                 <input
                   type="url"
-                  name="jobUrl"
-                  value={formData.jobUrl}
+                  name="jobPostingURL"
+                  value={formData.jobPostingURL}
                   onChange={handleChange}
                   placeholder="https://"
                   className="w-full p-3 border rounded-md"
@@ -213,102 +221,9 @@ function AddJob() {
             </form>
           </div>
         </div>
-
-        <div className="md:col-span-1">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6">
-            <img
-              src="/placeholder.svg?height=300&width=300"
-              alt="Person holding a coffee mug"
-              className="w-full h-auto rounded-md mb-4"
-            />
-            <div className="text-sm text-gray-500 mb-2">Photo by Brooke Lark</div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-xl font-semibold mb-4">Tips for Job Applications</h3>
-            <ul className="space-y-4">
-              <li className="flex">
-                <div className="text-green-500 mr-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                </div>
-                <span>Keep your application information organized and in one place</span>
-              </li>
-              <li className="flex">
-                <div className="text-green-500 mr-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                </div>
-                <span>Update application status promptly after each interaction</span>
-              </li>
-              <li className="flex">
-                <div className="text-green-500 mr-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                </div>
-                <span>Add detailed notes about specific requirements or interview feedback</span>
-              </li>
-              <li className="flex">
-                <div className="text-green-500 mr-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                </div>
-                <span>Save the job posting URL for future reference</span>
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default AddJob
+export default AddJob;

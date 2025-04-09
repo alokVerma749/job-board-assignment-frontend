@@ -1,29 +1,46 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const { login } = useAuth()
-  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setError("")
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const success = login(email, password)
-      if (success) {
-        navigate("/")
+      const response = await fetch("http://localhost:8000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to log in");
       }
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+      login(email, password)
+      navigate("/");
     } catch (error) {
-      setError("Failed to log in")
+      setError(error.message || "Failed to log in");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -34,21 +51,6 @@ function Login() {
         <div className="h-full w-full bg-black bg-opacity-50 flex flex-col justify-center p-12 text-white">
           <h2 className="text-4xl font-bold mb-4">Track Your Job Journey</h2>
           <p className="text-xl mb-8">Organize applications, monitor progress, and land your dream job</p>
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center mr-3">✓</div>
-              <p>Organize applications efficiently</p>
-            </div>
-            <div className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center mr-3">✓</div>
-              <p>Track application status easily</p>
-            </div>
-            <div className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center mr-3">✓</div>
-              <p>Get insights on your job search</p>
-            </div>
-          </div>
-          <div className="mt-auto text-sm">Photo by Glenn Carstens-Peters</div>
         </div>
       </div>
 
@@ -82,18 +84,14 @@ function Login() {
                 placeholder="••••••••"
                 required
               />
-              <div className="text-right mt-1">
-                <a href="#" className="text-sm text-blue-500 hover:text-blue-700">
-                  Forgot password?
-                </a>
-              </div>
             </div>
 
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 
@@ -108,7 +106,7 @@ function Login() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;
