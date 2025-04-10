@@ -32,7 +32,7 @@ function AddJob() {
     setError("");
 
     try {
-      const response = await fetch(`${process.env.DOMAIN}/api/applications`, {
+      const response = await fetch(`${import.meta.env.DOMAIN}/api/applications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

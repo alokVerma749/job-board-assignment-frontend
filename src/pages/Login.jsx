@@ -18,7 +18,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.DOMAIN}/api/auth/login`, {
+      const response = await fetch(`${import.meta.env.DOMAIN}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

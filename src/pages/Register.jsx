@@ -29,7 +29,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.DOMAIN}/api/auth/register`, {
+      const response = await fetch(`${import.meta.env.DOMAIN}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
