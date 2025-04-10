@@ -10,8 +10,8 @@ function ApplicationModal({ application, onClose }) {
     jobRole: "",
     location: "",
     status: "",
-    appliedDate: "",
-    jobUrl: "",
+    applicationDate: "",
+    jobPostingURL: "",
     salaryRange: "",
     notes: "",
   })
@@ -23,13 +23,17 @@ function ApplicationModal({ application, onClose }) {
         jobRole: application.jobRole || "",
         location: application.location || "",
         status: application.status || "",
-        appliedDate: application.appliedDate || "",
-        jobUrl: application.jobUrl || "",
+        applicationDate: application.applicationDate
+          ? new Date(application.applicationDate).toISOString().split("T")[0]
+          : "",
+        jobPostingURL: application.jobPostingURL || "",
         salaryRange: application.salaryRange || "",
         notes: application.notes || "",
       })
     }
   }, [application])
+
+  console.log(formData.applicationDate, '###')
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -106,8 +110,8 @@ function ApplicationModal({ application, onClose }) {
             <label className="block text-gray-700 text-sm font-bold mb-2">Application Date *</label>
             <input
               type="date"
-              name="appliedDate"
-              value={formData.appliedDate}
+              name="applicationDate"
+              value={formData.applicationDate}
               onChange={handleChange}
               className="w-full p-2 border rounded"
               required
@@ -118,8 +122,8 @@ function ApplicationModal({ application, onClose }) {
             <label className="block text-gray-700 text-sm font-bold mb-2">Job Posting URL</label>
             <input
               type="url"
-              name="jobUrl"
-              value={formData.jobUrl}
+              name="jobPostingURL"
+              value={formData.jobPostingURL}
               onChange={handleChange}
               className="w-full p-2 border rounded"
             />

@@ -13,7 +13,7 @@ function Applications() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("All Statuses")
   const [dateFilter, setDateFilter] = useState("")
-  const [sortField, setSortField] = useState("appliedDate")
+  const [sortField, setSortField] = useState("applicationDate")
   const [sortDirection, setSortDirection] = useState("desc")
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedApplication, setSelectedApplication] = useState(null)
@@ -49,7 +49,7 @@ function Applications() {
 
     const matchesStatus = statusFilter === "All Statuses" || app.status === statusFilter
 
-    const matchesDate = !dateFilter || app.appliedDate === dateFilter
+    const matchesDate = !dateFilter || app.applicationDate === dateFilter
 
     return matchesSearch && matchesStatus && matchesDate
   })
@@ -59,7 +59,7 @@ function Applications() {
     let aValue = a[sortField]
     let bValue = b[sortField]
 
-    if (sortField === "appliedDate") {
+    if (sortField === "applicationDate") {
       aValue = new Date(aValue)
       bValue = new Date(bValue)
     }
@@ -316,11 +316,11 @@ function Applications() {
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("appliedDate")}
+                  onClick={() => handleSort("applicationDate")}
                 >
                   <div className="flex items-center">
                     Date Applied
-                    {sortField === "appliedDate" && <span className="ml-1">{sortDirection === "asc" ? "↑" : "↓"}</span>}
+                    {sortField === "applicationDate" && <span className="ml-1">{sortDirection === "asc" ? "↑" : "↓"}</span>}
                   </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -331,7 +331,7 @@ function Applications() {
             <tbody className="bg-white divide-y divide-gray-200">
               {currentApplications.length > 0 ? (
                 currentApplications.map((application) => (
-                  <tr key={application.id}>
+                  <tr key={application._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <CompanyAvatar name={application.companyName} />
@@ -349,7 +349,7 @@ function Applications() {
                       <StatusBadge status={application.status} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(application.appliedDate).toLocaleDateString()}
+                      {new Date(application.applicationDate).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
