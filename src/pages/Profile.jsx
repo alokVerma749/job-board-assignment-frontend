@@ -21,7 +21,7 @@ function Profile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/auth/user/${user?.email}`, {
+        const response = await fetch(`${process.env.DOMAIN}/api/auth/user/${user?.email}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -65,7 +65,7 @@ function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch(`http://localhost:8000/api/auth/user/${user?.email}`, {
+      const response = await fetch(`${process.env.DOMAIN}/api/auth/user/${user?.email}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

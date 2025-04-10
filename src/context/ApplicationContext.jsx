@@ -20,7 +20,7 @@ export function ApplicationProvider({ children }) {
   const fetchApplications = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/applications/get-all-applications", {
+      const response = await fetch(`${process.env.DOMAIN}/api/applications/get-all-applications`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export function ApplicationProvider({ children }) {
   // Add a new application
   const addApplication = async (applicationData) => {
     try {
-      const response = await fetch("http://localhost:8000/api/applications", {
+      const response = await fetch(`${process.env.DOMAIN}/api/applications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export function ApplicationProvider({ children }) {
   // Update an existing application
   const updateApplication = async (id, applicationData) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/applications/${id}`, {
+      const response = await fetch(`${process.env.DOMAIN}/api/applications/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +99,7 @@ export function ApplicationProvider({ children }) {
   // Delete an application
   const deleteApplication = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/applications/${id}`, {
+      const response = await fetch(`${process.env.DOMAIN}/api/applications/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
